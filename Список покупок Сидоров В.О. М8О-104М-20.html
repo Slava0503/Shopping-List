@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    
+    <title>Список покупок</title> 
+    
+    <div id="container">
+     <div class = "title"
+      <h1>Список покупок</h1>
+     </div>
+    </div>
+    
+    
+    <p>
+    Введите название товара и добавьте его в список! Цену и количество товара указывать необязательно.
+    </p>
+    
+  <style>
+   .wrapper {
+    background-color: Thistle;
+    list-style-type: none;
+    padding: 0;
+    border-radius: 3px;
+   }
+   .form-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: .5em;
+   }
+   .form-row > label {
+    padding: .5em 1em .5em 0;
+    flex: 1;
+   }
+   .form-row > input {
+    flex: 2;
+   }
+    
+   li{
+    margin: 10px 0;
+   }
+   
+   
+   
+   body {
+    font-family: "Montserrat", sans-serif;  
+    font-size: 2rem;
+    color: MediumBlue; 
+    background-color: rgba(255, 228, 196)
+   }
+   
+   #container .list{
+    font-family: "Montserrat", sans-serif; 
+    font-size: 2rem;
+    text-align:left;
+    color: #DC143C; 
+  }
+  
+  #container .title{
+    font-family: "Montserrat", sans-serif; 
+    font-size: 3rem;
+    text-align:left;
+    color: DarkGreen; 
+  }
+  
+  ::placeholder {
+   font-size: 2rem;
+  }
+  
+  .button_input {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
+  .button_clear {
+    background-color: #FF0000; /* Red */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
+  
+  input[type="text"]
+  {
+    font-size:2rem;
+  }
+  input[type="number"]
+  {
+    font-size:2rem;
+  }
+  
+   
+   </style>
+
+<form>
+  <ul class="wrapper">
+    <li class="form-row">
+      <label for="item">Наименование товара: </label><input type="text" id="item" placeholder="Ржаной хлеб">
+    </li>
+    <li class="form-row">
+      <label for="price">Цена товара (за единицу): </label><input type="number" id="price" placeholder="99.90">
+    </li>
+    <li class="form-row">
+      <label for="price">Кол-во товара: </label><input type="text" id="amount" placeholder="3 булки">
+    </li> 
+  </ul>
+</form>
+ 
+  </head>
+ 
+
+  <body> 
+  
+       
+<div class="form">
+  
+  <button class="button_input" id="submit">Добавить товар в список</button>
+  <button class="button_clear" id="clear">Очистить все</button>
+  
+</div>
+
+<div id="container">
+ <div class = "list">
+
+   <ul id="list"> 
+   </ul>
+
+ </div>
+</div>
+
+<p id="total"></p> <!-- Для вывода на экран суммарной цены при любом её изменении -->
+  </body>
+  
+  
+  <script>
+   var itemInput = document.getElementById("item");
+   var itemPrice = document.getElementById("price");
+   var itemAmount = document.getElementById("amount");
+   var clear = document.getElementById("clear");
+   var submit = document.getElementById("submit");
+   var list = document.getElementById("list");
+   var totalPrice = 0;
+   var i = 1; //Для кнопки "Купить" или "В корзине"
+   
+   document.getElementById("total").innerHTML = "Суммарная цена составляет 0 рублей"; //Чтобы надпись была в самом начале, даже когда никаких товаров еще не добавлено
+
+//НАЖАЛИ НА ДОБАВИТЬ ТОВАР В СПИСОК
+   submit.onclick = function() { //По клику кнопки submit выполняем функцию addItem (создаем пункт списка, добавляем в него значение ввода, очищаем строку ввода)
+     var currentItem = itemInput.value; //Текущее значение ввода
+     var currentPrice = itemPrice.value; //Текущее значение ввода цены
+     var currentAmount = itemAmount.value; //Текущее значение ввода кол-ва
+     var listItem = document.createElement("li"); //Создаем список
+     
+     //Проверка поля цены
+     if (currentPrice === "") { //Если строка цены пуста, 
+     currentPrice = 0;          //делаем цену равной 0
+     } 
+     
+     //Проверка поля количества
+     if (currentAmount.replace(/\s/g, '') === "") { //Если строка КОЛ_ВА пуста, 
+     currentAmount = 1;          //делаем кол-во равному 1
+     } 
+     
+     //Проверка поля наименования
+     if (currentItem.replace(/\s/g, '') === "") { //Если в название товара НИЧЕГО или пробелы
+     listItem = ""; //Добавляем в лист пустой элемент (НЕ добавляем ничего, то есть)
+     itemInput.value = ""; //Очищаем строку ввода
+     itemPrice.value = ""; //Очищаем строку ввода цены
+     currentPrice = 0;          
+     alert("Наименование товара не может пустым");
+     } else if (currentPrice < 0) { //Если строка ЦЕНЫ меньше нуля,
+     currentPrice = 0;          //делаем цену равной 0
+     alert("Цена товара не может быть отрицательной");
+     } else if (parseInt(currentAmount) <= 0) {
+     currentPrice = 0;          //делаем цену равной 0
+     alert("Количество товара не может быть нулевым / отрицательным");
+     } else { //Если в названии что-то есть
+     
+     //Определяем listItem - элемент списка
+     if (isNaN(currentAmount)) { //Ели в поле кол-ва есть надпись
+     listItem.innerHTML = currentItem + " " + "(" + parseInt(currentPrice) + " рублей) " + " -- " + currentAmount;
+     } else { //Если в поле кол-ва есть только цифра
+     listItem.innerHTML = currentItem + " " + "(" + parseInt(currentPrice) + " рублей) " + " -- " + currentAmount + " единиц(ы)";
+     }//Это свойство предоставляет простой способ полностью заменить содержимое элемента. Придаем listItem значение текущего ввода (currentItem + currentPrice)
+     
+     //Добавляем listItem в список
+     list.appendChild(listItem); //list - это родительский элемент. listItem -  это элемент, который вставляется в конец list. appendChild - вставляет элемент (НЕ удаляет)
+     
+     //Кнопка "В корзине" и "Убрать из корзины"
+     var button = document.createElement("button"); //Создаем кнопку
+     button.innerHTML = "Добавить в корзину!"; //Надпись на кнопке
+     
+     button.style.cssText = "background-color: Tomato; padding: 15px 32px; text-align: center; font-size: 16px; display: inline-block; color: white;";
+     
+     var body = document.getElementsByTagName("body")[0];
+     
+     
+     button.setAttribute("id", "btnid" + i);
+     
+     list.appendChild(button);
+     
+     i = i + 1;
+     
+     //Чтобы кнопка была кликабельная для каждого элемента
+     var i_end = i;
+     
+     for (var j = 1; j < i_end; j++) {
+       var mybtn = document.getElementById("btnid" + j);
+     } //for закрывается   
+     
+       mybtn.onclick = function() {
+         if (mybtn.innerHTML == "Добавить в корзину!") {
+         mybtn.innerHTML = "В корзине! (Нажмите, чтобы убрать)";
+         mybtn.style.cssText = "background-color: #4CAF50; padding: 15px 32px; text-align: center; font-size: 16px; display: inline-block; color: white;";
+         } else {
+         mybtn.innerHTML = "Добавить в корзину!";
+         mybtn.style.cssText = "background-color: Tomato; padding: 15px 32px; text-align: center; font-size: 16px; display: inline-block; color: white;";
+         } //else закрывается
+       } //function закрывается
+
+     } //else закрывается
+     
+     //Суммарная цена
+     totalPrice = totalPrice + currentPrice*parseInt(currentAmount); //Считаем суммарную цену
+     
+     //Наводим красоту
+     itemInput.value = ""; //Очищаем строку ввода
+     itemPrice.value = ""; //Очищаем строку ввода цены
+     itemAmount.value = ""; //Очищаем строку ввода кол-ва
+     
+     //Выводим суммарную цену на экран
+     document.getElementById("total").innerHTML = "Суммарная цена составляет " + totalPrice + " рублей";
+   }
+   
+   
+   
+//НАЖАЛИ НА ОЧИСТИТЬ ВСЕ    
+   clear.onclick = function() { //По клику кнопки clear делаем следущее:
+     list.innerHTML = ""; //Очищаем весь лист
+     itemInput.value = ""; //Очищаем строку ввода
+     itemPrice.value = ""; //Очищаем строку ввода цены
+     totalPrice = 0; //Обнуляем общую цену
+     currentPrice = 0; //Обнуляем текущую цену товара
+     document.getElementById("total").innerHTML = "Суммарная цена составляет 0 рублей"; //Очищаем строку с суммарной ценой
+     i = 1;
+   }
+   
+   
+  </script>
+  
+  
+</html>
